@@ -16,7 +16,7 @@ def get_records():
       hasher.update(buf.encode('utf-8'))
       fileHash = hasher.hexdigest()
       if fileHash in seen:
-        print("Skipping file {filename}".format(filename=statement))
+        #print("Skipping file {filename}".format(filename=statement))
         continue
       seen.append(fileHash)
       csvfile.seek(0) # Go back to begining of file after hashing
@@ -60,7 +60,7 @@ def total_income(records):
 def total_payments(records):
   payments = Decimal(0.0)
   for record in records:
-    if isDebit(record):
+    if isDebit(record) and "BEDS" not in record[3]: #TODO ask HSBC about BEDS
       payments += Decimal(record[3])
   return payments
 
@@ -68,20 +68,49 @@ def filter_by_month_year(record, check_month, check_year):
   # The last element (-1) of records is assumed to be timestamp
   # %m Month as a zero-padded decimal number 01, 02, …, 12
   # %Y Year with century as a decimal number 0001, 0002, …, 2013, 2014...
+  # * If "*" is passed for either year or month, then all are included respectivly
+  if check_month is "*" and check_year is "*":
+    return True # No filter needed, both month and year is globbed
+
   date = datetime.fromtimestamp(record[-1])
   year = date.strftime("%Y")
   month = date.strftime("%m")
-  if (year == check_year and month == check_month):
+  # Filter on both month and year
+  if (month == check_month and year == check_year):
     return True
-  return False
+  # Just filter on year
+  if (check_month is "*" and check_year is not "*"):
+    if year == check_year:
+      return True
+  # Just filter on month. Why would anyone do this?
+  if (check_year is "*" and check_month is not "*"):
+    if month == check_month:
+      return True
+  return False #Always return false if we get here, no match
 
-def calculate():
-  year = input("Year:")
-  month = input("Month:")
+def calculate(year=None, month=None):
+  if year is None or month is None:
+    year = input("Year:")
+    month = input("Month:")
   records = get_records()
   records = list(filter(lambda record: filter_by_month_year(record, month, year), records))
+  if month != "*":
+    month = datetime.strptime(month, "%m").strftime("%b")
+  print("#### {month} {year} ####".format(month=month, year=year))
   print("Total payments: {}".format(str(total_payments(records))))
   print("Total income: {}".format(str(total_income(records))))
   print("Profit/Loss: {}".format(str(total_income(records) - total_payments(records))))
- 
-calculate() 
+
+def g():
+  calculate()
+
+def all(year, months):
+  # e.g. all("2019", "01,02,03,04,05")
+  monthsList = months.split(',')
+  for month in monthsList:
+    calculate(year=year, month=month)
+
+if __name__ == "__main__":
+  print("Usage:")
+  print("- calculate() # For single quick usage")
+  print('- all("2019", "01,02,03")')
