@@ -1,4 +1,4 @@
-# HSBC CVS Statement processer
+# HSBC CSV Statement processer
 
 - Easily & Quickly view total income/outgoing for each month
 - Query by year, month
