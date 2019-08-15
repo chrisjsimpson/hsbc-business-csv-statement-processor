@@ -88,6 +88,14 @@ def filter_by_month_year(record, check_month, check_year):
       return True
   return False #Always return false if we get here, no match
 
+def filter_by_needle(record, needle):
+    # Lower sting 
+    # find sting in description index 2
+    needle = needle.lower()
+    if needle in record[2].lower():
+        return True
+    return False
+
 def calculate(year=None, month=None):
   if year is None or month is None:
     year = input("Year:")
@@ -97,8 +105,11 @@ def calculate(year=None, month=None):
   if month != "*":
     month = datetime.strptime(month, "%m").strftime("%b")
   print("#### {month} {year} ####".format(month=month, year=year))
-  print("Total payments: {}".format(str(total_payments(records))))
-  print("Total income: {}".format(str(total_income(records))))
+  total_paid = total_payments(records)
+  total_recieved = total_income(records)
+  print("Total payments: {}".format(str(total_paid)))
+  print("Total income: {}".format(str(total_recieved)))
+  profitLoss = total_income(records) - total_payments(records)
   print("Profit/Loss: {}".format(str(total_income(records) - total_payments(records))))
 
 def g():
@@ -110,7 +121,10 @@ def all(year, months):
   for month in monthsList:
     calculate(year=year, month=month)
 
-if __name__ == "__main__":
+def usage():
   print("Usage:")
   print("- calculate() # For single quick usage")
   print('- all("2019", "01,02,03")')
+
+if __name__ == "__main__":
+  usage()
