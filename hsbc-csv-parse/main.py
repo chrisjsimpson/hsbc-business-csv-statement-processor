@@ -16,7 +16,7 @@ def get_records():
       hasher.update(buf.encode('utf-8'))
       fileHash = hasher.hexdigest()
       if fileHash in seen:
-        #print("Skipping file {filename}".format(filename=statement))
+        print("Skipping file {filename}".format(filename=statement))
         continue
       seen.append(fileHash)
       csvfile.seek(0) # Go back to begining of file after hashing
@@ -98,6 +98,22 @@ def filter_by_needle(record, needle):
     if needle in record[2].lower():
         return True
     return False
+
+def search(needle):
+  # split on or string if used (e.g. a search for "this OR that")
+  found = []
+  for needle in needle.split("OR"):
+    records = get_records()
+    # Filter by needle
+    records = list(filter(lambda record: filter_by_needle(record, needle.strip()), records))
+    found.append(records)
+  #Make unique (an OR query may result in the same record(s) being found twice)
+  seen = []
+  for record in found:
+    if record not in seen:
+      seen.append(record)
+  
+  return seen
 
 def calculate(year=None, month=None):
   if year is None or month is None:
