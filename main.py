@@ -40,15 +40,18 @@ def get_records():
 #  8 - Timestamp (we created and added)
 
 def isDebit(record):
-  if record[3] is not '':
+  try:
+    Decimal(record[3])
     return True
-  return False
+  except:
+    return False
 
 def isCredit(record):
-  if record[4] is not '':
+  try:
+    Decimal(record[4])
     return True
-  return False
-
+  except:
+    return False
 
 def total_income(records):
   income = Decimal(0.0)
