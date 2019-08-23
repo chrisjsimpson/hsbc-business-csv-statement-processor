@@ -123,13 +123,15 @@ def calculate(year=None, month=None):
   records = list(filter(lambda record: filter_by_month_year(record, month, year), records))
   if month != "*":
     month = datetime.strptime(month, "%m").strftime("%b")
-  print("#### {month} {year} ####".format(month=month, year=year))
+  msg = "#### {month} {year} ####\n".format(month=month, year=year)
   total_paid = total_payments(records)
   total_recieved = total_income(records)
-  print("Total payments: {}".format(str(total_paid)))
-  print("Total income: {}".format(str(total_recieved)))
+  msg += "Total payments: {}\n".format(str(total_paid))
+  msg += "Total income: {}\n".format(str(total_recieved))
   profitLoss = total_income(records) - total_payments(records)
-  print("Profit/Loss: {}".format(str(total_income(records) - total_payments(records))))
+  msg += "Profit/Loss: {}\n".format(str(total_income(records) - total_payments(records)))
+  print(msg)
+  return msg
 
 def g():
   calculate()

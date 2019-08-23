@@ -1,5 +1,9 @@
 # HSBC CSV Statement processer
 
+Parse HSBC business csv statement exports, and easily view
+totall outgoings/income. Also ability to search through 
+transactions.
+
 - Easily & Quickly view total income/outgoing for each month
 - Query by year, month
 
@@ -42,3 +46,14 @@ Total income: 3603.81
 Profit/Loss: 1061.81
 ```
 
+### Search
+
+Simple search:
+```
+> search("ASDA") 
+```
+
+OR based search
+```
+> search("ASDA OR Wallmart")
+```
