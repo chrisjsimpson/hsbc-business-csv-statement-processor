@@ -83,7 +83,7 @@ def filter_by_month_year(record, check_month, check_year):
   if check_month is "*" and check_year is "*":
     return True # No filter needed, both month and year is globbed
 
-  date = datetime.fromtimestamp(record[-1])
+  date = datetime.fromtimestamp(int(float(record[-1])))
   year = date.strftime("%Y")
   month = date.strftime("%m")
   # Filter on both month and year
