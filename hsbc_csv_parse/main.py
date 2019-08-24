@@ -5,6 +5,13 @@ import hashlib # for file checking
 path = Path('./statements')
 from decimal import Decimal
 
+def normalize(record):
+  """ Remove formating inconsistences"""
+  for index, attribute in enumerate(record):
+    record[index] = str(record[index]).strip()
+  return record
+       
+
 def get_records():
   seen = [] # Prevent processing the same file twice, by storing list of hashes
   records = [] #empty list of records, which we build from the statements
@@ -25,6 +32,7 @@ def get_records():
       for row in reader:
         # Convert date to timestamp, append to end of record for easy sorting
         row.append(datetime.strptime(row[0], "%d %b %Y").timestamp())
+        row = normalize(row)
         records.append(row)
       
   records.sort(key=lambda record: record[-1]) # Sort on last element (a timestamp)
@@ -106,7 +114,9 @@ def search(needle):
     records = get_records()
     # Filter by needle
     records = list(filter(lambda record: filter_by_needle(record, needle.strip()), records))
-    found.append(records)
+    for record in records:
+      record = normalize(record)
+      found.append(record)
   #Make unique (an OR query may result in the same record(s) being found twice)
   seen = []
   for record in found:
