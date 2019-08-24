@@ -7,6 +7,10 @@ transactions.
 - Easily & Quickly view total income/outgoing for each month
 - Query by year, month
 
+Works well with https://github.com/chrisjsimpson/hsbc-business-bank-statements-downloader
+which can download *all* of your csv statements so you don't have to do it
+manually.
+
 Steps to use:
   1. Download your csv statements and put in the 'statements' folder
   2. run the program `python main.py`
