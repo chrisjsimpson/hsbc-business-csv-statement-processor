@@ -4,6 +4,11 @@ from datetime import datetime
 import hashlib # for file checking
 path = Path('./statements')
 from decimal import Decimal
+from collections import namedtuple
+
+HSBCStatementRecord = namedtuple('HSBCStatementRecord', ['date', 'type', 
+                                'description', 'debit', 'credit', 'balance',
+                                'timestamp'])
 
 def normalize(record):
   """ Remove formating inconsistences"""
@@ -33,7 +38,11 @@ def get_records():
         # Convert date to timestamp, append to end of record for easy sorting
         row.append(datetime.strptime(row[0], "%d %b %Y").timestamp())
         row = normalize(row)
-        records.append(row)
+        if len(row) == 8: # NOTE Why are HSBC statement lines on rare occasions 8 elements rather than 7?
+          """ Concatenate element 3 into element 2 (description) then delete (pop) the third element"""
+          row[2] = row[2] + ' ' + row[3]
+          row.pop(3)
+        records.append(HSBCStatementRecord._make(row))
       
   records.sort(key=lambda record: record[-1]) # Sort on last element (a timestamp)
   return records
@@ -49,14 +58,14 @@ def get_records():
 
 def isDebit(record):
   try:
-    Decimal(record[3])
+    Decimal(record.debit)
     return True
   except:
     return False
 
 def isCredit(record):
   try:
-    Decimal(record[4])
+    Decimal(record.credit)
     return True
   except:
     return False
@@ -65,14 +74,14 @@ def total_income(records):
   income = Decimal(0.0)
   for record in records:
     if isCredit(record):
-      income += Decimal(record[4])
+      income += Decimal(record.credit)
   return income
 
 def total_payments(records):
   payments = Decimal(0.0)
   for record in records:
     if isDebit(record) and "BEDS" not in record[3]: #TODO ask HSBC about BEDS
-      payments += Decimal(record[3])
+      payments += Decimal(record.debit)
   return payments
 
 def filter_by_month_year(record, check_month, check_year):
